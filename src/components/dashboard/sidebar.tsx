@@ -24,7 +24,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/leads", label: "Leads", icon: KanbanSquare },
-  { href: "/dashboard/projects", label: "Projects", icon: FolderKanban, disabled: true },
+  { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
   { href: "/dashboard/invoices", label: "Invoices", icon: FileText, disabled: true },
   { href: "/dashboard/appointments", label: "Appointments", icon: CalendarClock, disabled: true },
 ];
