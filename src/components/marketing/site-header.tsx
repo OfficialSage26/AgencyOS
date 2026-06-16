@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Layers } from "lucide-react";
+import { Show, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
@@ -32,12 +33,20 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
-            Sign in
-          </Button>
-          <Button size="sm" render={<Link href="/sign-up" />}>
-            Get started
-          </Button>
+          <Show when="signed-out">
+            <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
+              Sign in
+            </Button>
+            <Button size="sm" render={<Link href="/sign-up" />}>
+              Get started
+            </Button>
+          </Show>
+          <Show when="signed-in">
+            <Button variant="ghost" size="sm" render={<Link href="/dashboard" />}>
+              Dashboard
+            </Button>
+            <UserButton />
+          </Show>
         </div>
       </div>
     </header>
