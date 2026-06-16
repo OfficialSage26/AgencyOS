@@ -8,7 +8,7 @@ AgencyOS replaces spreadsheets, manual invoicing, scattered chat threads, and a 
 
 | Layer | Choice |
 |-------|--------|
-| Framework | [Next.js 15](https://nextjs.org/) (App Router) |
+| Framework | [Next.js 16](https://nextjs.org/) (App Router) |
 | Language | TypeScript |
 | Styling | Tailwind CSS + [shadcn/ui](https://ui.shadcn.com/) |
 | Data fetching | React Query (TanStack Query) |
