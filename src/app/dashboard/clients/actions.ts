@@ -5,14 +5,7 @@ import type { ZodError } from "zod";
 import { requireTenant } from "@/lib/tenant/context";
 import { forOrg } from "@/lib/tenant/scoped-db";
 import { clientInputSchema, noteInputSchema } from "@/lib/validations/client";
-
-export type ActionState = {
-  ok: boolean;
-  error?: string;
-  fieldErrors?: Record<string, string>;
-};
-
-export const initialActionState: ActionState = { ok: false };
+import type { ActionState } from "@/app/dashboard/clients/types";
 
 function toFieldErrors(error: ZodError): Record<string, string> {
   const fieldErrors: Record<string, string> = {};

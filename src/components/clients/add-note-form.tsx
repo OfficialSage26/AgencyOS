@@ -4,7 +4,8 @@ import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { addClientNote, initialActionState } from "@/app/dashboard/clients/actions";
+import { addClientNote } from "@/app/dashboard/clients/actions";
+import { initialActionState } from "@/app/dashboard/clients/types";
 
 export function AddNoteForm({ clientId }: { clientId: string }) {
   const action = addClientNote.bind(null, clientId);
