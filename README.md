@@ -6,21 +6,21 @@ AgencyOS replaces spreadsheets, manual invoicing, scattered chat threads, and a 
 
 ## Tech Stack
 
-| Layer | Choice |
-|-------|--------|
-| Framework | [Next.js 16](https://nextjs.org/) (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS + [shadcn/ui](https://ui.shadcn.com/) |
-| Data fetching | React Query (TanStack Query) |
-| Client state | Zustand |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Auth & orgs | [Clerk](https://clerk.com/) |
-| Payments | [Stripe](https://stripe.com/) Billing |
-| File storage | [UploadThing](https://uploadthing.com/) |
-| AI | [Claude API](https://docs.anthropic.com/) |
-| Charts | Recharts |
-| Email | Resend |
+| Layer         | Choice                                             |
+| ------------- | -------------------------------------------------- |
+| Framework     | [Next.js 16](https://nextjs.org/) (App Router)     |
+| Language      | TypeScript                                         |
+| Styling       | Tailwind CSS + [shadcn/ui](https://ui.shadcn.com/) |
+| Data fetching | React Query (TanStack Query)                       |
+| Client state  | Zustand                                            |
+| Database      | PostgreSQL                                         |
+| ORM           | Prisma                                             |
+| Auth & orgs   | [Clerk](https://clerk.com/)                        |
+| Payments      | [Stripe](https://stripe.com/) Billing              |
+| File storage  | [UploadThing](https://uploadthing.com/)            |
+| AI            | [Claude API](https://docs.anthropic.com/)          |
+| Charts        | Recharts                                           |
+| Email         | Resend                                             |
 
 ## Core Features
 

@@ -10,13 +10,13 @@ The original PDF is a strong **vision doc** but a weak **build spec**: scope is 
 
 ## 1. Resolved Tech Decisions (no more "OR")
 
-| Area | PDF said | Decision | Why |
-|------|----------|----------|-----|
-| Auth | Clerk OR NextAuth | **Clerk** | Built-in Organizations + invites + roles = multi-tenancy out of the box. |
-| Storage | UploadThing OR S3 | **UploadThing** | Simplest path; signed uploads handled. S3 is premature. |
-| AI | Claude OR OpenAI | **Claude API** (`claude-opus-4-8` for quality, `claude-haiku-4-5` for cheap/fast generators) | Best instruction-following for proposals/contracts; single provider. |
-| DB | PostgreSQL + Prisma | **Keep** (host: Neon or Supabase Postgres) | Unchanged. |
-| Payments | Stripe | **Keep** — Stripe **Billing** (Products/Prices + Customer Portal + webhooks) | Don't hand-roll subscription state. |
+| Area     | PDF said            | Decision                                                                                     | Why                                                                      |
+| -------- | ------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Auth     | Clerk OR NextAuth   | **Clerk**                                                                                    | Built-in Organizations + invites + roles = multi-tenancy out of the box. |
+| Storage  | UploadThing OR S3   | **UploadThing**                                                                              | Simplest path; signed uploads handled. S3 is premature.                  |
+| AI       | Claude OR OpenAI    | **Claude API** (`claude-opus-4-8` for quality, `claude-haiku-4-5` for cheap/fast generators) | Best instruction-following for proposals/contracts; single provider.     |
+| DB       | PostgreSQL + Prisma | **Keep** (host: Neon or Supabase Postgres)                                                   | Unchanged.                                                               |
+| Payments | Stripe              | **Keep** — Stripe **Billing** (Products/Prices + Customer Portal + webhooks)                 | Don't hand-roll subscription state.                                      |
 
 **Confirmed stack:** Next.js 15 (App Router) · TypeScript · Tailwind · shadcn/ui · React Query · Zustand · Prisma/Postgres · Clerk · Stripe · UploadThing · Claude API · Recharts.
 
@@ -39,20 +39,24 @@ The original PDF is a strong **vision doc** but a weak **build spec**: scope is 
 Every original entity kept. New/changed marked **(NEW)** / **(FIX)**.
 
 ### Identity & tenancy
+
 - **Organization**: `id, name, slug, logo, plan, stripeCustomerId (NEW), createdAt`
 - **User**: `id, clerkUserId (NEW), name, email, avatar, createdAt` — role/org moved to Membership **(FIX)**
 - **Membership (NEW)**: `id, userId, organizationId, role` — user can belong to multiple orgs; role is per-org. Roles: `SUPER_ADMIN, OWNER, MEMBER, CLIENT`. Fixes the original single-FK `User.organizationId`.
 
 ### Billing (was entirely missing — NEW)
+
 - **Subscription (NEW)**: `id, organizationId, stripeSubscriptionId, plan (FREE|PRO|AGENCY), status, currentPeriodEnd`
 - **Plan limits enforced in code:** FREE = 5 clients / 2 projects / no AI; PRO = unlimited + AI; AGENCY = + team + client portal + advanced analytics. `assertWithinPlanLimit()` checked on create.
 
 ### CRM & sales
+
 - **Client**: `id, organizationId, name, email, phone, company, notes, status, createdAt`
 - **Lead**: `id, organizationId, title, source, value, stage, createdAt` — stages: New, Contacted, Proposal Sent, Negotiation, Won, Lost
 - **Activity (NEW)**: `id, organizationId, clientId, userId, type, description, createdAt` — powers the CRM activity timeline.
 
 ### Delivery
+
 - **Project**: `id, organizationId, clientId, title, description, status, progress, deadline, budget` — status: Planning, Active, Review, Completed
 - **ProjectMember (NEW)**: `id, projectId, userId, role` — implements "assign team members"
 - **Task**: `id, projectId, assignedTo, title, status, dueDate`
@@ -61,6 +65,7 @@ Every original entity kept. New/changed marked **(NEW)** / **(FIX)**.
 - **Appointment**: `id, organizationId, clientId, startTime, endTime, notes`
 
 ### Comms & files
+
 - **Conversation (NEW)** + **Message (FIX)**: `id, organizationId (FIX), conversationId (FIX), senderId, content, createdAt`. Original sender/receiver-only model broke tenant isolation.
 - **File**: `id, organizationId, projectId, uploadedBy, fileUrl, fileName, sizeBytes (NEW), createdAt (NEW)`
 - **Notification (NEW)**: `id, organizationId, userId, type, payload, readAt`
