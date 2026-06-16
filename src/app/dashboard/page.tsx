@@ -1,64 +1,19 @@
-import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { CreateOrganization, OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { Layers } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { syncTenant } from "@/lib/tenant/sync";
-import { forOrg } from "@/lib/tenant/scoped-db";
-
-function DashboardHeader({ showSwitcher = true }: { showSwitcher?: boolean }) {
-  return (
-    <header className="border-border/60 bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-          <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
-            <Layers className="size-4" />
-          </span>
-          AgencyOS
-        </Link>
-        <div className="flex items-center gap-3">
-          {showSwitcher && (
-            <OrganizationSwitcher hidePersonal afterCreateOrganizationUrl="/dashboard" />
-          )}
-          <UserButton />
-        </div>
-      </div>
-    </header>
-  );
-}
+import { DashboardHeader } from "@/components/dashboard/header";
+import { requireTenantDb } from "@/lib/tenant/context";
 
 export default async function DashboardPage() {
-  const { orgId } = await auth();
-
-  // No active organization yet → onboarding. Every tenant in AgencyOS is an
-  // organization, so the user creates or selects one before entering the app.
-  if (!orgId) {
-    return (
-      <div className="flex min-h-full flex-col">
-        <DashboardHeader showSwitcher={false} />
-        <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
-          <h1 className="mb-2 text-2xl font-bold tracking-tight">Create your workspace</h1>
-          <p className="text-muted-foreground mb-8 max-w-md text-center">
-            AgencyOS organizes everything under an organization. Create one to get started — your
-            clients, projects, and invoices live here.
-          </p>
-          <CreateOrganization afterCreateOrganizationUrl="/dashboard" skipInvitationScreen />
-        </main>
-      </div>
-    );
-  }
-
-  const tenant = await syncTenant();
+  const { db } = await requireTenantDb();
   const user = await currentUser();
   const greetingName = user?.firstName ?? user?.username ?? "there";
 
-  // All queries below are automatically scoped to this organization.
-  const tdb = forOrg(tenant!.organizationId);
+  // All queries are automatically scoped to the active organization.
   const [activeClients, openProjects, pendingInvoices, revenue] = await Promise.all([
-    tdb.client.count({ where: { status: "ACTIVE" } }),
-    tdb.project.count({ where: { status: { in: ["PLANNING", "ACTIVE", "REVIEW"] } } }),
-    tdb.invoice.count({ where: { status: { in: ["SENT", "OVERDUE"] } } }),
-    tdb.invoice.aggregate({ _sum: { amount: true }, where: { status: "PAID" } }),
+    db.client.count({ where: { status: "ACTIVE" } }),
+    db.project.count({ where: { status: { in: ["PLANNING", "ACTIVE", "REVIEW"] } } }),
+    db.invoice.count({ where: { status: { in: ["SENT", "OVERDUE"] } } }),
+    db.invoice.aggregate({ _sum: { amount: true }, where: { status: "PAID" } }),
   ]);
 
   const totalRevenue = revenue._sum.amount ?? 0;
@@ -70,12 +25,12 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="flex min-h-full flex-col">
-      <DashboardHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back, {greetingName} 👋</h1>
+    <>
+      <DashboardHeader title="Overview" />
+      <main className="flex-1 px-4 py-8 md:px-6">
+        <h2 className="text-2xl font-bold tracking-tight">Welcome back, {greetingName} 👋</h2>
         <p className="text-muted-foreground mt-1">
-          This is your AgencyOS dashboard. Modules will appear here as they ship.
+          Here&apos;s a snapshot of your business. Modules appear here as they ship.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -93,6 +48,6 @@ export default async function DashboardPage() {
           ))}
         </div>
       </main>
-    </div>
+    </>
   );
 }
