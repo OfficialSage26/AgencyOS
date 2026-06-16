@@ -11,10 +11,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import type { VariantProps } from "class-variance-authority";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { createClient, updateClient } from "@/app/dashboard/clients/actions";
 import { initialActionState, type ActionState } from "@/app/dashboard/clients/types";
 import { CLIENT_STATUSES } from "@/lib/validations/client";
@@ -32,7 +34,13 @@ export type ClientFormValues = {
 type Props = {
   mode: "create" | "edit";
   client?: ClientFormValues;
-  trigger: React.ReactNode;
+  // The DialogTrigger renders as the button itself (styled via buttonVariants)
+  // to avoid nesting two data-slot components, which breaks hydration.
+  triggerChildren: React.ReactNode;
+  triggerVariant?: VariantProps<typeof buttonVariants>["variant"];
+  triggerSize?: VariantProps<typeof buttonVariants>["size"];
+  triggerClassName?: string;
+  triggerAriaLabel?: string;
 };
 
 function FieldError({ message }: { message?: string }) {
@@ -40,7 +48,15 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-destructive text-sm">{message}</p>;
 }
 
-export function ClientFormDialog({ mode, client, trigger }: Props) {
+export function ClientFormDialog({
+  mode,
+  client,
+  triggerChildren,
+  triggerVariant,
+  triggerSize,
+  triggerClassName,
+  triggerAriaLabel,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<ActionState>(initialActionState);
   const [pending, startTransition] = useTransition();
@@ -63,7 +79,15 @@ export function ClientFormDialog({ mode, client, trigger }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={trigger as React.ReactElement} />
+      <DialogTrigger
+        aria-label={triggerAriaLabel}
+        className={cn(
+          buttonVariants({ variant: triggerVariant, size: triggerSize }),
+          triggerClassName,
+        )}
+      >
+        {triggerChildren}
+      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={onSubmit}>
           <DialogHeader>

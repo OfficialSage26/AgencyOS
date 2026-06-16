@@ -12,7 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { deleteClient } from "@/app/dashboard/clients/actions";
 import { ClientFormDialog, type ClientFormValues } from "@/components/clients/client-form-dialog";
 
@@ -35,12 +36,11 @@ function DeleteClientDialog({ client }: { client: ClientFormValues }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        render={
-          <Button variant="ghost" size="icon-sm" aria-label="Delete client">
-            <Trash2 className="text-muted-foreground size-4" />
-          </Button>
-        }
-      />
+        aria-label="Delete client"
+        className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+      >
+        <Trash2 className="text-muted-foreground size-4" />
+      </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Delete client</DialogTitle>
@@ -68,11 +68,10 @@ export function ClientRowActions({ client }: { client: ClientFormValues }) {
       <ClientFormDialog
         mode="edit"
         client={client}
-        trigger={
-          <Button variant="ghost" size="icon-sm" aria-label="Edit client">
-            <Pencil className="text-muted-foreground size-4" />
-          </Button>
-        }
+        triggerVariant="ghost"
+        triggerSize="icon-sm"
+        triggerAriaLabel="Edit client"
+        triggerChildren={<Pencil className="text-muted-foreground size-4" />}
       />
       <DeleteClientDialog client={client} />
     </div>

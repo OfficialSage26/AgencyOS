@@ -63,11 +63,13 @@ export default async function ClientDetailPage({
           <ClientFormDialog
             mode="edit"
             client={values}
-            trigger={
-              <Button variant="outline" size="sm">
+            triggerVariant="outline"
+            triggerSize="sm"
+            triggerChildren={
+              <>
                 <Pencil className="size-4" />
                 Edit
-              </Button>
+              </>
             }
           />
         </div>

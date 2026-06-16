@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Plus, Users } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/header";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -26,11 +25,12 @@ function NewClientButton() {
   return (
     <ClientFormDialog
       mode="create"
-      trigger={
-        <Button size="sm">
+      triggerSize="sm"
+      triggerChildren={
+        <>
           <Plus className="size-4" />
           New client
-        </Button>
+        </>
       }
     />
   );
