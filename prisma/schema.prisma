@@ -1,0 +1,449 @@
+// AgencyOS Prisma schema
+// Multi-tenant SaaS data model. Every tenant-owned row carries `organizationId`
+// and data access is scoped to the active organization at the application layer.
+// See docs/AgencyOS - Refined Blueprint.md for the full architecture.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  SUPER_ADMIN
+  OWNER
+  MEMBER
+  CLIENT
+}
+
+enum Plan {
+  FREE
+  PRO
+  AGENCY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  REVIEW
+  COMPLETED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+}
+
+enum ActivityType {
+  NOTE
+  EMAIL
+  CALL
+  MEETING
+  STATUS_CHANGE
+  FILE_UPLOAD
+  INVOICE_SENT
+}
+
+enum NotificationType {
+  INVOICE_DUE
+  INVOICE_PAID
+  APPOINTMENT_REMINDER
+  NEW_MESSAGE
+  PROJECT_UPDATE
+  TASK_ASSIGNED
+}
+
+enum AiDocumentType {
+  PROPOSAL
+  CONTRACT
+  FOLLOW_UP
+  MEETING_SUMMARY
+}
+
+// ---------------------------------------------------------------------------
+// Identity & tenancy
+// ---------------------------------------------------------------------------
+
+model Organization {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  logo             String?
+  plan             Plan     @default(FREE)
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  memberships   Membership[]
+  subscription  Subscription?
+  clients       Client[]
+  leads         Lead[]
+  activities    Activity[]
+  projects      Project[]
+  invoices      Invoice[]
+  appointments  Appointment[]
+  conversations Conversation[]
+  messages      Message[]
+  files         File[]
+  notifications Notification[]
+  aiDocuments   AiDocument[]
+
+  @@index([slug])
+}
+
+model User {
+  id          String   @id @default(cuid())
+  clerkUserId String   @unique
+  name        String?
+  email       String   @unique
+  avatar      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  memberships    Membership[]
+  projectMembers ProjectMember[]
+  assignedTasks  Task[]          @relation("TaskAssignee")
+  activities     Activity[]
+  uploadedFiles  File[]
+  sentMessages   Message[]       @relation("MessageSender")
+  notifications  Notification[]
+  aiDocuments    AiDocument[]
+}
+
+// A user's role within a specific organization. Users may belong to many orgs.
+model Membership {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           Role     @default(MEMBER)
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
+// ---------------------------------------------------------------------------
+// Billing
+// ---------------------------------------------------------------------------
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  organizationId       String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  plan                 Plan               @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// CRM & sales
+// ---------------------------------------------------------------------------
+
+model Client {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  notes          String?
+  status         ClientStatus @default(ACTIVE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projects      Project[]
+  invoices      Invoice[]
+  appointments  Appointment[]
+  activities    Activity[]
+  conversations Conversation[]
+
+  @@index([organizationId])
+}
+
+model Lead {
+  id             String    @id @default(cuid())
+  organizationId String
+  title          String
+  source         String?
+  value          Decimal?  @db.Decimal(12, 2)
+  stage          LeadStage @default(NEW)
+  position       Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, stage])
+}
+
+// Timeline entries for a client (powers the CRM activity feed).
+model Activity {
+  id             String       @id @default(cuid())
+  organizationId String
+  clientId       String?
+  userId         String?
+  type           ActivityType @default(NOTE)
+  description    String
+  createdAt      DateTime     @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Delivery
+// ---------------------------------------------------------------------------
+
+model Project {
+  id             String        @id @default(cuid())
+  organizationId String
+  clientId       String?
+  title          String
+  description    String?
+  status         ProjectStatus @default(PLANNING)
+  progress       Int           @default(0)
+  deadline       DateTime?
+  budget         Decimal?      @db.Decimal(12, 2)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client       Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  members      ProjectMember[]
+  tasks        Task[]
+  files        File[]
+
+  @@index([organizationId])
+  @@index([clientId])
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model Task {
+  id         String     @id @default(cuid())
+  projectId  String
+  assignedTo String?
+  title      String
+  status     TaskStatus @default(TODO)
+  dueDate    DateTime?
+  position   Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee User?   @relation("TaskAssignee", fields: [assignedTo], references: [id], onDelete: SetNull)
+
+  @@index([projectId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Invoicing
+// ---------------------------------------------------------------------------
+
+model Invoice {
+  id             String        @id @default(cuid())
+  organizationId String
+  clientId       String?
+  number         String
+  amount         Decimal       @default(0) @db.Decimal(12, 2)
+  currency       String        @default("USD")
+  status         InvoiceStatus @default(DRAFT)
+  issuedAt       DateTime?
+  dueDate        DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  items        InvoiceItem[]
+
+  @@unique([organizationId, number])
+  @@index([organizationId, status])
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Decimal @default(1) @db.Decimal(12, 2)
+  unitPrice   Decimal @default(0) @db.Decimal(12, 2)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+// ---------------------------------------------------------------------------
+// Scheduling
+// ---------------------------------------------------------------------------
+
+model Appointment {
+  id             String   @id @default(cuid())
+  organizationId String
+  clientId       String?
+  title          String?
+  startTime      DateTime
+  endTime        DateTime
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, startTime])
+}
+
+// ---------------------------------------------------------------------------
+// Communication & files
+// ---------------------------------------------------------------------------
+
+model Conversation {
+  id             String   @id @default(cuid())
+  organizationId String
+  clientId       String?
+  subject        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  messages     Message[]
+
+  @@index([organizationId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  organizationId String
+  conversationId String
+  senderId       String?
+  content        String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User?        @relation("MessageSender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId])
+  @@index([organizationId])
+}
+
+model File {
+  id             String   @id @default(cuid())
+  organizationId String
+  projectId      String?
+  uploadedBy     String?
+  fileUrl        String
+  fileName       String
+  sizeBytes      Int?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  project      Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  uploader     User?        @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([projectId])
+}
+
+// ---------------------------------------------------------------------------
+// Notifications & AI
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id             String           @id @default(cuid())
+  organizationId String
+  userId         String
+  type           NotificationType
+  payload        Json?
+  readAt         DateTime?
+  createdAt      DateTime         @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId, readAt])
+}
+
+// Persisted output of an AI generator so it can be edited and reused.
+model AiDocument {
+  id             String         @id @default(cuid())
+  organizationId String
+  createdById    String?
+  type           AiDocumentType
+  title          String
+  input          Json?
+  content        String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, type])
+}
