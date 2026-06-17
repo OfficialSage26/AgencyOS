@@ -14,10 +14,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex min-h-full flex-col">
         <header className="border-border/60 flex h-16 items-center justify-between border-b px-6">
           <span className="flex items-center gap-2 font-semibold">
-            <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
+            <span className="bg-aurora shadow-aurora flex size-8 items-center justify-center rounded-lg text-white">
               <Layers className="size-4" />
             </span>
-            AgencyOS
+            <span className="tracking-tight">
+              Agency<span className="text-aurora">OS</span>
+            </span>
           </span>
           <UserButton />
         </header>

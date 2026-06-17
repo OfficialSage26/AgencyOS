@@ -6,12 +6,13 @@ import { Badge } from "@/components/ui/badge";
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
+      <div className="aurora-glow pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
+      <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
         <Badge variant="secondary" className="mb-6">
           One platform for your whole agency
         </Badge>
         <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-6xl">
-          Run your agency without the spreadsheet chaos
+          Run your agency without the <span className="text-aurora">spreadsheet chaos</span>
         </h1>
         <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg text-pretty">
           AgencyOS replaces scattered tools with a single operating system: clients, leads,
