@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/leads", label: "Leads", icon: KanbanSquare },
   { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
   { href: "/dashboard/invoices", label: "Invoices", icon: FileText },
-  { href: "/dashboard/appointments", label: "Appointments", icon: CalendarClock, disabled: true },
+  { href: "/dashboard/appointments", label: "Appointments", icon: CalendarClock },
 ];
 
 export function DashboardSidebar() {
