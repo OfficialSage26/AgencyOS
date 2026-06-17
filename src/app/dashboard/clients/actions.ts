@@ -1,11 +1,17 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import type { ZodError } from "zod";
 import { requireTenant } from "@/lib/tenant/context";
 import { forOrg } from "@/lib/tenant/scoped-db";
 import { clientInputSchema, noteInputSchema } from "@/lib/validations/client";
 import type { ActionState } from "@/app/dashboard/clients/types";
+
+// URL-safe, high-entropy token for the capability-link client portal.
+function generatePortalToken() {
+  return randomBytes(24).toString("base64url");
+}
 
 function toFieldErrors(error: ZodError): Record<string, string> {
   const fieldErrors: Record<string, string> = {};
@@ -102,6 +108,62 @@ export async function deleteClient(clientId: string): Promise<ActionState> {
   }
   revalidatePath("/dashboard/clients");
   revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+// Enable the portal (minting a token if needed) or regenerate the link to
+// revoke the previous one. Returns the active token on success.
+export async function enableClientPortal(
+  clientId: string,
+  regenerate = false,
+): Promise<ActionState & { token?: string }> {
+  const tenant = await requireTenant();
+  const db = forOrg(tenant.organizationId);
+
+  const client = await db.client.findFirst({
+    where: { id: clientId },
+    select: { portalToken: true },
+  });
+  if (!client) return { ok: false, error: "Client not found." };
+
+  const token = !regenerate && client.portalToken ? client.portalToken : generatePortalToken();
+  await db.client.updateMany({ where: { id: clientId }, data: { portalToken: token } });
+
+  await db.activity.create({
+    data: {
+      organizationId: tenant.organizationId,
+      clientId,
+      userId: tenant.userId,
+      type: "STATUS_CHANGE",
+      description: regenerate ? "Regenerated client portal link" : "Enabled client portal access",
+    },
+  });
+
+  revalidatePath(`/dashboard/clients/${clientId}`);
+  return { ok: true, token };
+}
+
+export async function disableClientPortal(clientId: string): Promise<ActionState> {
+  const tenant = await requireTenant();
+  const db = forOrg(tenant.organizationId);
+
+  const result = await db.client.updateMany({
+    where: { id: clientId },
+    data: { portalToken: null },
+  });
+  if (result.count === 0) return { ok: false, error: "Client not found." };
+
+  await db.activity.create({
+    data: {
+      organizationId: tenant.organizationId,
+      clientId,
+      userId: tenant.userId,
+      type: "STATUS_CHANGE",
+      description: "Disabled client portal access",
+    },
+  });
+
+  revalidatePath(`/dashboard/clients/${clientId}`);
   return { ok: true };
 }
 
