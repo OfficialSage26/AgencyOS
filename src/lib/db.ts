@@ -17,7 +17,9 @@ function createPrismaClient() {
   const adapter = new PrismaPg({ connectionString, ssl: { rejectUnauthorized: false } });
   return new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    // Query-level logging is noisy and adds per-query I/O overhead; keep it off
+    // and only surface warnings/errors. Flip on "query" temporarily when debugging.
+    log: ["warn", "error"],
   });
 }
 
