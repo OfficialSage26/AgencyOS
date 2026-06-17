@@ -48,73 +48,96 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ===========================================================================
+   Aurora — modern SaaS theme (indigo → violet). Token-driven: changing these
+   variables restyles every shadcn/Base UI component across the app at once.
+   =========================================================================== */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Cool, near-white canvas with a faint indigo tint */
+  --background: oklch(0.991 0.003 280);
+  --foreground: oklch(0.205 0.02 280);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.205 0.02 280);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.205 0.02 280);
+
+  /* Indigo → violet brand */
+  --primary: oklch(0.545 0.22 277);
+  --primary-foreground: oklch(0.99 0.01 280);
+  --aurora-from: oklch(0.55 0.22 277);
+  --aurora-to: oklch(0.58 0.2 305);
+
+  --secondary: oklch(0.965 0.012 280);
+  --secondary-foreground: oklch(0.3 0.04 280);
+  --muted: oklch(0.967 0.01 280);
+  --muted-foreground: oklch(0.53 0.03 280);
+  --accent: oklch(0.95 0.025 280);
+  --accent-foreground: oklch(0.4 0.12 277);
+
+  --destructive: oklch(0.585 0.225 27.5);
+  --border: oklch(0.916 0.01 280);
+  --input: oklch(0.916 0.01 280);
+  --ring: oklch(0.62 0.19 277);
+
+  /* Cohesive multi-hue chart palette */
+  --chart-1: oklch(0.58 0.2 277);
+  --chart-2: oklch(0.6 0.21 303);
+  --chart-3: oklch(0.7 0.14 232);
+  --chart-4: oklch(0.72 0.15 162);
+  --chart-5: oklch(0.8 0.15 80);
+
+  --radius: 0.7rem;
+
+  --sidebar: oklch(0.985 0.006 280);
+  --sidebar-foreground: oklch(0.3 0.02 280);
+  --sidebar-primary: oklch(0.545 0.22 277);
+  --sidebar-primary-foreground: oklch(0.99 0.01 280);
+  --sidebar-accent: oklch(0.95 0.025 280);
+  --sidebar-accent-foreground: oklch(0.4 0.12 277);
+  --sidebar-border: oklch(0.916 0.01 280);
+  --sidebar-ring: oklch(0.62 0.19 277);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Deep indigo-navy canvas */
+  --background: oklch(0.17 0.022 277);
+  --foreground: oklch(0.965 0.01 280);
+  --card: oklch(0.215 0.025 277);
+  --card-foreground: oklch(0.965 0.01 280);
+  --popover: oklch(0.215 0.025 277);
+  --popover-foreground: oklch(0.965 0.01 280);
+
+  --primary: oklch(0.66 0.19 280);
+  --primary-foreground: oklch(0.16 0.03 277);
+  --aurora-from: oklch(0.64 0.2 277);
+  --aurora-to: oklch(0.66 0.19 305);
+
+  --secondary: oklch(0.27 0.03 277);
+  --secondary-foreground: oklch(0.965 0.01 280);
+  --muted: oklch(0.27 0.03 277);
+  --muted-foreground: oklch(0.72 0.04 280);
+  --accent: oklch(0.3 0.05 280);
+  --accent-foreground: oklch(0.92 0.04 290);
+
+  --destructive: oklch(0.7 0.19 22);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.62 0.19 277);
+
+  --chart-1: oklch(0.66 0.19 280);
+  --chart-2: oklch(0.68 0.2 303);
+  --chart-3: oklch(0.72 0.14 232);
+  --chart-4: oklch(0.74 0.15 162);
+  --chart-5: oklch(0.82 0.15 80);
+
+  --sidebar: oklch(0.2 0.024 277);
+  --sidebar-foreground: oklch(0.92 0.02 280);
+  --sidebar-primary: oklch(0.66 0.19 280);
+  --sidebar-primary-foreground: oklch(0.16 0.03 277);
+  --sidebar-accent: oklch(0.3 0.05 280);
+  --sidebar-accent-foreground: oklch(0.92 0.04 290);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.62 0.19 277);
 }
 
 @layer base {
@@ -126,5 +149,27 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  /* Brand gradient fills and gradient text */
+  .bg-aurora {
+    background-image: linear-gradient(135deg, var(--aurora-from), var(--aurora-to));
+  }
+  .text-aurora {
+    background-image: linear-gradient(120deg, var(--aurora-from), var(--aurora-to));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .shadow-aurora {
+    box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--aurora-from) 55%, transparent);
+  }
+  /* Soft ambient glow blobs for hero / empty backdrops */
+  .aurora-glow {
+    background:
+      radial-gradient(40% 50% at 15% 0%, color-mix(in oklab, var(--aurora-from) 22%, transparent), transparent 70%),
+      radial-gradient(40% 50% at 85% 10%, color-mix(in oklab, var(--aurora-to) 20%, transparent), transparent 70%);
   }
 }

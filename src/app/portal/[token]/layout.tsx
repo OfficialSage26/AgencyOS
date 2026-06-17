@@ -5,7 +5,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
     <div className="bg-muted/30 flex min-h-full flex-col">
       <header className="border-border/60 bg-background flex h-16 items-center justify-between border-b px-6">
         <span className="flex items-center gap-2 font-semibold">
-          <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
+          <span className="bg-aurora shadow-aurora flex size-8 items-center justify-center rounded-lg text-white">
             <Layers className="size-4" />
           </span>
           Client Portal

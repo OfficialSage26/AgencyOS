@@ -37,10 +37,12 @@ export function DashboardSidebar() {
   return (
     <aside className="border-border/60 bg-background hidden w-60 shrink-0 border-r md:flex md:flex-col">
       <div className="flex h-16 items-center gap-2 px-6 font-semibold">
-        <span className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
+        <span className="bg-aurora shadow-aurora flex size-8 items-center justify-center rounded-lg text-white">
           <Layers className="size-4" />
         </span>
-        AgencyOS
+        <span className="tracking-tight">
+          Agency<span className="text-aurora">OS</span>
+        </span>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {navItems.map((item) => {
@@ -68,9 +70,9 @@ export function DashboardSidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                "relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                 active
-                  ? "bg-muted text-foreground font-medium"
+                  ? "bg-primary/10 text-primary font-medium before:bg-primary before:absolute before:top-1.5 before:bottom-1.5 before:-left-px before:w-1 before:rounded-full before:content-['']"
                   : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
               )}
             >
