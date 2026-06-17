@@ -196,6 +196,8 @@ model Client {
   company        String?
   notes          String?
   status         ClientStatus @default(ACTIVE)
+  // Capability token for the read-only client portal. Null = portal disabled.
+  portalToken    String?      @unique
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 

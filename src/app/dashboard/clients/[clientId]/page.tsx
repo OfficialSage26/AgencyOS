@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -17,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { requireTenantDb } from "@/lib/tenant/context";
 import { ClientFormDialog, type ClientFormValues } from "@/components/clients/client-form-dialog";
 import { AddNoteForm } from "@/components/clients/add-note-form";
+import { ClientPortalCard } from "@/components/clients/client-portal-card";
 
 const statusBadge: Record<ClientFormValues["status"], string> = {
   ACTIVE: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400",
@@ -34,6 +36,13 @@ export default async function ClientDetailPage({
 
   const client = await db.client.findFirst({ where: { id: clientId } });
   if (!client) notFound();
+
+  // Build the portal base URL from the incoming request so the shareable link
+  // is correct in any environment (no client-side window access needed).
+  const headerList = await headers();
+  const host = headerList.get("host") ?? "";
+  const proto = headerList.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  const baseUrl = host ? `${proto}://${host}` : "";
 
   const activities = await db.activity.findMany({
     where: { clientId },
@@ -114,6 +123,19 @@ export default async function ClientDetailPage({
                 <CardContent className="text-sm whitespace-pre-wrap">{client.notes}</CardContent>
               </Card>
             )}
+
+            <Card className="border-border/60">
+              <CardHeader>
+                <CardTitle>Client portal</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ClientPortalCard
+                  clientId={client.id}
+                  initialToken={client.portalToken}
+                  baseUrl={baseUrl}
+                />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Activity timeline */}
