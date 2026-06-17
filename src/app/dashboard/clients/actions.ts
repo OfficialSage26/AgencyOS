@@ -6,6 +6,7 @@ import type { ZodError } from "zod";
 import { requireTenant } from "@/lib/tenant/context";
 import { forOrg } from "@/lib/tenant/scoped-db";
 import { clientInputSchema, noteInputSchema } from "@/lib/validations/client";
+import { planLimitError } from "@/lib/billing/limits";
 import type { ActionState } from "@/app/dashboard/clients/types";
 
 // URL-safe, high-entropy token for the capability-link client portal.
@@ -45,6 +46,9 @@ export async function createClient(_prev: ActionState, formData: FormData): Prom
   }
 
   const db = forOrg(tenant.organizationId);
+  const limitError = await planLimitError(db, tenant.organizationId, "clients");
+  if (limitError) return { ok: false, error: limitError };
+
   const client = await db.client.create({
     data: { ...parsed.data, organizationId: tenant.organizationId },
   });

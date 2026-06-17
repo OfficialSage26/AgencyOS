@@ -14,6 +14,7 @@ import {
   safeFileName,
 } from "@/lib/validations/file";
 import { deleteObject, pathFromPublicUrl, uploadObject } from "@/lib/storage";
+import { planLimitError } from "@/lib/billing/limits";
 
 // Task and ProjectMember have no organizationId; they are scoped through their
 // parent Project. Always confirm the project belongs to the active org via the
@@ -59,6 +60,9 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
   }
 
   const orgDb = forOrg(tenant.organizationId);
+  const limitError = await planLimitError(orgDb, tenant.organizationId, "projects");
+  if (limitError) return { ok: false, error: limitError };
+
   if (parsed.data.clientId) {
     const client = await orgDb.client.findFirst({
       where: { id: parsed.data.clientId },

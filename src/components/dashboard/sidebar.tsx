@@ -9,6 +9,7 @@ import {
   FolderKanban,
   FileText,
   CalendarClock,
+  CreditCard,
   Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
   { href: "/dashboard/invoices", label: "Invoices", icon: FileText },
   { href: "/dashboard/appointments", label: "Appointments", icon: CalendarClock },
+  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
 ];
 
 export function DashboardSidebar() {
