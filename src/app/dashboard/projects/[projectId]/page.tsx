@@ -13,6 +13,7 @@ import {
 import { DeleteProjectButton } from "@/components/projects/delete-project-button";
 import { TaskList, type MemberOption, type TaskItem } from "@/components/projects/task-list";
 import { ProjectMembers } from "@/components/projects/project-members";
+import { ProjectFiles, type ProjectFileItem } from "@/components/projects/project-files";
 import {
   PROJECT_STATUS_LABELS,
   type ProjectStatus,
@@ -27,6 +28,14 @@ const statusBadge: Record<ProjectStatus, string> = {
 };
 
 const displayName = (user: { name: string | null; email: string }) => user.name ?? user.email;
+
+function mimeHint(fileName: string): ProjectFileItem["mimeHint"] {
+  const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+  if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) return "image";
+  if (ext === "pdf") return "pdf";
+  if (ext === "zip") return "zip";
+  return "other";
+}
 
 export default async function ProjectDetailPage({
   params,
@@ -45,6 +54,10 @@ export default async function ProjectDetailPage({
         include: { assignee: { select: { name: true, email: true } } },
       },
       members: { include: { user: { select: { id: true, name: true, email: true } } } },
+      files: {
+        orderBy: { createdAt: "desc" },
+        include: { uploader: { select: { name: true, email: true } } },
+      },
     },
   });
   if (!project) notFound();
@@ -85,6 +98,16 @@ export default async function ProjectDetailPage({
   }));
   const memberIds = new Set(projectMembers.map((m) => m.userId));
   const availableMembers = allMembers.filter((m) => !memberIds.has(m.userId));
+
+  const files: ProjectFileItem[] = project.files.map((f) => ({
+    id: f.id,
+    fileName: f.fileName,
+    fileUrl: f.fileUrl,
+    sizeBytes: f.sizeBytes,
+    uploaderName: f.uploader ? displayName(f.uploader) : null,
+    createdAt: f.createdAt.toLocaleDateString(),
+    mimeHint: mimeHint(f.fileName),
+  }));
 
   return (
     <>
@@ -180,6 +203,15 @@ export default async function ProjectDetailPage({
             </CardContent>
           </Card>
         </div>
+
+        <Card className="border-border/60 mt-6">
+          <CardHeader>
+            <CardTitle>Files</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProjectFiles projectId={project.id} files={files} />
+          </CardContent>
+        </Card>
       </main>
     </>
   );

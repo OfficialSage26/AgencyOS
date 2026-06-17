@@ -1,11 +1,19 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireTenant } from "@/lib/tenant/context";
 import { forOrg, type ScopedDb } from "@/lib/tenant/scoped-db";
 import { type ActionState, toFieldErrors } from "@/lib/forms";
 import { projectInputSchema, taskInputSchema, taskStatusSchema } from "@/lib/validations/project";
+import {
+  MAX_FILE_BYTES,
+  formatBytes,
+  isAllowedMime,
+  safeFileName,
+} from "@/lib/validations/file";
+import { deleteObject, pathFromPublicUrl, uploadObject } from "@/lib/storage";
 
 // Task and ProjectMember have no organizationId; they are scoped through their
 // parent Project. Always confirm the project belongs to the active org via the
@@ -201,6 +209,81 @@ export async function removeProjectMember(projectId: string, userId: string): Pr
   if (!(await ownsProject(orgDb, projectId))) return { ok: false, error: "Project not found." };
 
   await db.projectMember.deleteMany({ where: { projectId, userId } });
+  revalidatePath(`/dashboard/projects/${projectId}`);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Files (Supabase Storage)
+// ---------------------------------------------------------------------------
+
+export async function uploadProjectFile(
+  projectId: string,
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const tenant = await requireTenant();
+  const file = formData.get("file");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: "Choose a file to upload." };
+  }
+  if (file.size > MAX_FILE_BYTES) {
+    return { ok: false, error: `File is too large (max ${formatBytes(MAX_FILE_BYTES)}).` };
+  }
+  if (!isAllowedMime(file.type)) {
+    return { ok: false, error: "That file type isn't allowed." };
+  }
+
+  const orgDb = forOrg(tenant.organizationId);
+  if (!(await ownsProject(orgDb, projectId))) return { ok: false, error: "Project not found." };
+
+  const path = `${tenant.organizationId}/${projectId}/${randomBytes(8).toString("hex")}-${safeFileName(
+    file.name,
+  )}`;
+
+  let fileUrl: string;
+  try {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    fileUrl = await uploadObject(path, file.type || "application/octet-stream", bytes);
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Upload failed. Please try again.",
+    };
+  }
+
+  await orgDb.file.create({
+    data: {
+      organizationId: tenant.organizationId,
+      projectId,
+      uploadedBy: tenant.userId,
+      fileUrl,
+      fileName: file.name,
+      sizeBytes: file.size,
+    },
+  });
+
+  revalidatePath(`/dashboard/projects/${projectId}`);
+  return { ok: true };
+}
+
+export async function deleteProjectFile(projectId: string, fileId: string): Promise<ActionState> {
+  const tenant = await requireTenant();
+  const orgDb = forOrg(tenant.organizationId);
+  if (!(await ownsProject(orgDb, projectId))) return { ok: false, error: "Project not found." };
+
+  const record = await orgDb.file.findFirst({
+    where: { id: fileId, projectId },
+    select: { fileUrl: true },
+  });
+  if (!record) return { ok: false, error: "File not found." };
+
+  // Remove from storage first (best effort), then drop the DB record.
+  const path = pathFromPublicUrl(record.fileUrl);
+  if (path) await deleteObject(path);
+  await orgDb.file.deleteMany({ where: { id: fileId, projectId } });
+
   revalidatePath(`/dashboard/projects/${projectId}`);
   return { ok: true };
 }
