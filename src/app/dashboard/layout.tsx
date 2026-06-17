@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { CreateOrganization, UserButton } from "@clerk/nextjs";
 import { Layers } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { syncTenant } from "@/lib/tenant/sync";
+import { getTenant } from "@/lib/tenant/context";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { orgId } = await auth();
@@ -35,8 +35,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     );
   }
 
-  // Ensure the Clerk user, org, and membership exist in our database.
-  await syncTenant();
+  // Ensure the tenant is provisioned. After the first visit this is a single
+  // cached DB read (shared with the page below); it only calls Clerk + writes
+  // on the very first load after an org is created.
+  await getTenant();
 
   return (
     <div className="flex min-h-full">

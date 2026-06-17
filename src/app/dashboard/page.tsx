@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { currentUser } from "@clerk/nextjs/server";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -216,10 +215,12 @@ function StatCard({
 }
 
 export default async function DashboardPage() {
-  const { db } = await requireTenantDb();
-  const user = await currentUser();
-  const greetingName = user?.firstName ?? user?.username ?? "there";
-  const d = await loadDashboard(db);
+  const { tenant, db } = await requireTenantDb();
+  const [d, me] = await Promise.all([
+    loadDashboard(db),
+    db.user.findUnique({ where: { id: tenant.userId }, select: { name: true } }),
+  ]);
+  const greetingName = me?.name?.split(" ")[0] ?? "there";
 
   const projectSegments: DonutSegment[] = (
     Object.keys(PROJECT_COLORS) as ProjectStatus[]
