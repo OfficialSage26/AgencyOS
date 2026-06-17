@@ -9,6 +9,8 @@ export type ActionState = {
   ok: boolean;
   error?: string;
   fieldErrors?: Record<string, string>;
+  /** Optional client-side redirect target on success (e.g. to a new record). */
+  redirectTo?: string;
 };
 
 export const initialActionState: ActionState = { ok: false };
