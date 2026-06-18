@@ -1,30 +1,38 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
+// Fonts are self-hosted (vendored under ./fonts) so production builds don't
+// depend on Google Fonts being reachable at build time.
+const geistSans = localFont({
+  src: "./fonts/geist.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/geist-mono.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
 // Marketing display + body faces for the Aurora landing page.
-const spaceGrotesk = Space_Grotesk({
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk.woff2",
   variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "300 700",
+  display: "swap",
 });
 
-const jakarta = Plus_Jakarta_Sans({
+const jakarta = localFont({
+  src: "./fonts/plus-jakarta-sans.woff2",
   variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "200 800",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
