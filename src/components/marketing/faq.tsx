@@ -35,10 +35,10 @@ const faqs = [
 
 export function Faq() {
   return (
-    <section id="faq" className="border-border/60 bg-muted/30 border-t">
-      <div className="mx-auto max-w-3xl px-4 py-24">
+    <section id="faq" className="border-border/60 border-t">
+      <div className="mx-auto max-w-3xl px-7 py-[90px]">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="font-display text-[clamp(28px,4.5vw,38px)] font-bold tracking-[-0.03em]">
             Frequently asked questions
           </h2>
         </div>

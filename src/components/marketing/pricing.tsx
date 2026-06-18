@@ -1,69 +1,86 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { PLANS, PLAN_ORDER } from "@/config/plans";
 
+const ctaLabel: Record<string, string> = {
+  FREE: "Get started",
+  PRO: "Start free trial",
+  AGENCY: "Contact sales",
+};
+
 export function Pricing() {
   return (
-    <section id="pricing" className="border-border/60 border-t">
-      <div className="mx-auto max-w-6xl px-4 py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Simple, transparent pricing
-          </h2>
-          <p className="text-muted-foreground mt-4">
-            Start free and upgrade as you grow. No hidden fees.
-          </p>
-        </div>
+    <section id="pricing" className="mx-auto max-w-6xl px-7 py-[90px]">
+      <div className="mx-auto mb-[52px] max-w-[560px] text-center">
+        <h2 className="font-display text-[clamp(30px,5vw,42px)] font-bold tracking-[-0.03em] text-balance">
+          Simple, honest pricing
+        </h2>
+        <p className="text-muted-foreground mt-3.5 text-[17px]">
+          Start free. Upgrade when your agency grows. Cancel anytime.
+        </p>
+      </div>
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-3">
-          {PLAN_ORDER.map((planId) => {
-            const plan = PLANS[planId];
-            return (
-              <Card
-                key={plan.id}
+      <div className="grid items-start gap-[18px] lg:grid-cols-3">
+        {PLAN_ORDER.map((planId) => {
+          const plan = PLANS[planId];
+          const highlighted = plan.highlighted;
+          return (
+            <div
+              key={plan.id}
+              className={cn(
+                "bg-card relative rounded-[18px] border p-[30px]",
+                highlighted
+                  ? "border-primary shadow-aurora border-[1.5px]"
+                  : "border-border/70",
+              )}
+            >
+              {highlighted && (
+                <span className="bg-aurora absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3.5 py-[5px] text-[12px] font-semibold text-white">
+                  MOST POPULAR
+                </span>
+              )}
+              <div
                 className={cn(
-                  "border-border/60 flex flex-col",
-                  plan.highlighted && "border-primary shadow-lg",
+                  "text-[16px] font-semibold",
+                  highlighted ? "text-primary" : "text-muted-foreground",
                 )}
               >
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl">{plan.name}</CardTitle>
-                    {plan.highlighted && <Badge>Most popular</Badge>}
-                  </div>
-                  <p className="text-muted-foreground text-sm">{plan.description}</p>
-                  <div className="pt-4">
-                    <span className="text-4xl font-bold">${plan.priceMonthly}</span>
-                    <span className="text-muted-foreground">/month</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <ul className="space-y-3 text-sm">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <Check className="text-primary mt-0.5 size-4 shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    variant={plan.highlighted ? "default" : "outline"}
-                    render={<Link href="/sign-up" />}
-                  >
-                    {plan.priceMonthly === 0 ? "Get started" : `Choose ${plan.name}`}
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
+                {plan.name}
+              </div>
+              <div className="mt-3">
+                <span className="font-display text-[46px] font-bold tracking-[-0.03em]">
+                  ${plan.priceMonthly}
+                </span>
+                <span className="text-muted-foreground text-[15px]">/mo</span>
+              </div>
+              <p className="text-muted-foreground mt-1.5 text-[14px]">{plan.description}</p>
+
+              <div className="bg-border/70 my-[22px] h-px" />
+
+              <ul className="flex flex-col gap-[11px] text-[14px]">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5">
+                    <Check className="text-primary mt-0.5 size-4 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                href="/sign-up"
+                className={cn(
+                  "mt-[26px] block rounded-[11px] py-3 text-center text-[14.5px] font-semibold transition-opacity hover:opacity-90",
+                  highlighted
+                    ? "bg-aurora shadow-aurora text-white"
+                    : "border-border text-foreground border",
+                )}
+              >
+                {ctaLabel[plan.id] ?? "Get started"}
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

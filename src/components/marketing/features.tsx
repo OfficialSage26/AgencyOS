@@ -1,45 +1,35 @@
 import {
-  Users,
   KanbanSquare,
   FolderKanban,
   FileText,
-  CalendarClock,
-  FolderUp,
   LayoutDashboard,
+  CalendarClock,
   Sparkles,
+  type LucideIcon,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const features = [
-  {
-    icon: Users,
-    title: "CRM",
-    description: "Manage clients, notes, and a full activity timeline in one organized place.",
-  },
+type Feature = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  highlighted?: boolean;
+};
+
+const features: Feature[] = [
   {
     icon: KanbanSquare,
-    title: "Lead pipeline",
-    description: "Track deals from New to Won on a drag-and-drop Kanban board.",
+    title: "CRM & pipeline",
+    description: "Track every client and move deals New → Won on a drag-and-drop board.",
   },
   {
     icon: FolderKanban,
     title: "Projects & tasks",
-    description: "Assign team members, track tasks, and watch progress in real time.",
+    description: "Assign team members, track tasks, and watch progress update in real time.",
   },
   {
     icon: FileText,
     title: "Invoicing",
-    description: "Create line-item invoices, export PDFs, and track payments.",
-  },
-  {
-    icon: CalendarClock,
-    title: "Scheduling",
-    description: "Share a booking page, manage availability, and send reminders.",
-  },
-  {
-    icon: FolderUp,
-    title: "File sharing",
-    description: "Organize files in project folders and share them with clients.",
+    description: "Build line-item invoices, export clean PDFs, and track every payment.",
   },
   {
     icon: LayoutDashboard,
@@ -47,41 +37,67 @@ const features = [
     description: "Give clients their own dashboard for progress, invoices, and messages.",
   },
   {
+    icon: CalendarClock,
+    title: "Scheduling",
+    description: "Share a booking page, manage availability, and auto-send reminders.",
+  },
+  {
     icon: Sparkles,
     title: "AI generators",
-    description: "Draft proposals, contracts, and follow-ups in seconds with AI.",
+    description: "Draft proposals, contracts, and follow-ups in seconds — then edit and send.",
+    highlighted: true,
   },
 ];
 
 export function Features() {
   return (
-    <section id="features" className="border-border/60 bg-muted/30 border-t">
-      <div className="mx-auto max-w-6xl px-4 py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Everything you need to run the business
-          </h2>
-          <p className="text-muted-foreground mt-4">
-            Stop stitching together five different tools. AgencyOS brings your whole workflow under
-            one roof.
-          </p>
-        </div>
+    <section id="features" className="mx-auto max-w-6xl px-7 py-[90px]">
+      <div className="mx-auto mb-14 max-w-[620px] text-center">
+        <p className="text-primary text-[13px] font-bold tracking-[0.06em] uppercase">
+          Everything in one place
+        </p>
+        <h2 className="font-display mt-3 text-[clamp(30px,5vw,42px)] font-bold tracking-[-0.03em] text-balance">
+          Stop stitching tools together
+        </h2>
+        <p className="text-muted-foreground mt-3.5 text-[17px] leading-relaxed">
+          From first lead to final invoice, every part of the agency workflow lives under one roof.
+        </p>
+      </div>
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature) => (
-            <Card key={feature.title} className="border-border/60">
-              <CardHeader>
-                <span className="bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg">
-                  <feature.icon className="size-5" />
+      <div className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
+        {features.map((feature) => {
+          const Icon = feature.icon;
+          if (feature.highlighted) {
+            return (
+              <div
+                key={feature.title}
+                className="bg-aurora rounded-2xl p-[26px] text-white"
+              >
+                <span className="flex size-[42px] items-center justify-center rounded-[11px] bg-white/20">
+                  <Icon className="size-5" />
                 </span>
-                <CardTitle className="pt-2 text-lg">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-muted-foreground text-sm">
+                <h3 className="font-display mt-4 text-[18px] font-semibold">{feature.title}</h3>
+                <p className="mt-2 text-[14.5px] leading-relaxed text-white/85">
+                  {feature.description}
+                </p>
+              </div>
+            );
+          }
+          return (
+            <div
+              key={feature.title}
+              className="border-border/70 bg-card rounded-2xl border p-[26px] transition-shadow hover:shadow-md"
+            >
+              <span className="bg-accent text-primary flex size-[42px] items-center justify-center rounded-[11px]">
+                <Icon className="size-5" />
+              </span>
+              <h3 className="font-display mt-4 text-[18px] font-semibold">{feature.title}</h3>
+              <p className="text-muted-foreground mt-2 text-[14.5px] leading-relaxed">
                 {feature.description}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </p>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
