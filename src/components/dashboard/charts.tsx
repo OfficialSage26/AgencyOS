@@ -5,11 +5,11 @@
 
 // --- shared helpers ---------------------------------------------------------
 
-export function compactMoney(amount: number, currency = "USD") {
+export function compactMoney(amount: number, currency = "PHP") {
   const sign = amount < 0 ? "-" : "";
   const abs = Math.abs(amount);
   const symbol =
-    { USD: "$", EUR: "€", GBP: "£", CAD: "$", AUD: "$" }[currency] ?? `${currency} `;
+    { PHP: "₱", USD: "$", EUR: "€", GBP: "£", CAD: "$", AUD: "$" }[currency] ?? `${currency} `;
   if (abs >= 1_000_000) return `${sign}${symbol}${(abs / 1_000_000).toFixed(1)}M`;
   if (abs >= 1_000) return `${sign}${symbol}${(abs / 1_000).toFixed(1)}k`;
   return `${sign}${symbol}${abs.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;

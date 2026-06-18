@@ -172,4 +172,34 @@
       radial-gradient(40% 50% at 15% 0%, color-mix(in oklab, var(--aurora-from) 22%, transparent), transparent 70%),
       radial-gradient(40% 50% at 85% 10%, color-mix(in oklab, var(--aurora-to) 20%, transparent), transparent 70%);
   }
+
+  /* Marketing typefaces — Space Grotesk for display, Plus Jakarta Sans for body.
+     Scoped via utility classes so the dashboard stays on Geist. */
+  .font-display {
+    font-family: var(--font-space-grotesk), var(--font-sans), ui-sans-serif, sans-serif;
+  }
+  .font-body {
+    font-family: var(--font-jakarta), var(--font-sans), ui-sans-serif, sans-serif;
+  }
+
+  /* Gentle hover/float for the hero product showcase. */
+  .animate-aurora-float {
+    animation: aurora-float 7s ease-in-out infinite;
+  }
+}
+
+@keyframes aurora-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora-float {
+    animation: none;
+  }
 }

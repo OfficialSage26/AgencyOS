@@ -1,19 +1,25 @@
 import Link from "next/link";
-import { Layers } from "lucide-react";
+import { BrandMark } from "@/components/marketing/brand-mark";
+
+const links = ["Product", "Pricing", "Customers", "Docs", "Privacy"];
 
 export function SiteFooter() {
   return (
     <footer className="border-border/60 border-t">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-10 sm:flex-row">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <span className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-lg">
-            <Layers className="size-4" />
-          </span>
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-[18px] px-7 py-11">
+        <Link
+          href="/"
+          className="font-display flex items-center gap-2.5 text-[16px] font-bold"
+        >
+          <BrandMark className="size-[26px] rounded-lg" />
           AgencyOS
         </Link>
-        <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} AgencyOS. All rights reserved.
-        </p>
+        <div className="text-muted-foreground flex gap-7 text-[14px] font-medium">
+          {links.map((label) => (
+            <span key={label}>{label}</span>
+          ))}
+        </div>
+        <div className="text-muted-foreground/70 text-[13px]">© 2026 AgencyOS, Inc.</div>
       </div>
     </footer>
   );

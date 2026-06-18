@@ -19,6 +19,7 @@ import {
   type ProjectStatus,
   type TaskStatus,
 } from "@/lib/validations/project";
+import { formatDate } from "@/lib/format";
 
 const statusBadge: Record<ProjectStatus, string> = {
   PLANNING: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
@@ -84,7 +85,7 @@ export default async function ProjectDetailPage({
     id: task.id,
     title: task.title,
     status: task.status as TaskStatus,
-    dueDate: task.dueDate ? task.dueDate.toLocaleDateString() : null,
+    dueDate: task.dueDate ? formatDate(task.dueDate) : null,
     assigneeName: task.assignee ? displayName(task.assignee) : null,
   }));
 
@@ -105,7 +106,7 @@ export default async function ProjectDetailPage({
     fileUrl: f.fileUrl,
     sizeBytes: f.sizeBytes,
     uploaderName: f.uploader ? displayName(f.uploader) : null,
-    createdAt: f.createdAt.toLocaleDateString(),
+    createdAt: formatDate(f.createdAt),
     mimeHint: mimeHint(f.fileName),
   }));
 
@@ -169,7 +170,7 @@ export default async function ProjectDetailPage({
                   </dd>
                   <dt className="text-muted-foreground">Deadline</dt>
                   <dd className="text-right">
-                    {project.deadline ? project.deadline.toLocaleDateString() : "—"}
+                    {project.deadline ? formatDate(project.deadline) : "—"}
                   </dd>
                 </dl>
                 {project.description && (

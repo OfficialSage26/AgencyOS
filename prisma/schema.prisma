@@ -312,7 +312,7 @@ model Invoice {
   clientId       String?
   number         String
   amount         Decimal       @default(0) @db.Decimal(12, 2)
-  currency       String        @default("USD")
+  currency       String        @default("PHP")
   status         InvoiceStatus @default(DRAFT)
   issuedAt       DateTime?
   dueDate        DateTime?

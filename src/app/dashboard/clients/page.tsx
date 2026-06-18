@@ -14,6 +14,7 @@ import { requireTenantDb } from "@/lib/tenant/context";
 import { ClientFormDialog, type ClientFormValues } from "@/components/clients/client-form-dialog";
 import { ClientRowActions } from "@/components/clients/client-row-actions";
 import { ClientsSearch } from "@/components/clients/clients-search";
+import { formatDate } from "@/lib/format";
 
 const statusBadge: Record<ClientFormValues["status"], string> = {
   ACTIVE: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400",
@@ -123,7 +124,7 @@ export default async function ClientsPage({
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {client.createdAt.toLocaleDateString()}
+                        {formatDate(client.createdAt)}
                       </TableCell>
                       <TableCell>
                         <ClientRowActions client={values} />

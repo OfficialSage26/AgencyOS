@@ -13,6 +13,7 @@ import { InvoiceItems, type InvoiceItemRow } from "@/components/invoices/invoice
 import { InvoiceStatusSelect } from "@/components/invoices/invoice-status-select";
 import { DeleteInvoiceButton } from "@/components/invoices/delete-invoice-button";
 import { formatMoney, type Currency } from "@/lib/validations/invoice";
+import { formatDate } from "@/lib/format";
 
 const toDateInput = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
 
@@ -107,12 +108,10 @@ export default async function InvoiceDetailPage({
                 <dd className="text-right">{invoice.currency}</dd>
                 <dt className="text-muted-foreground">Issued</dt>
                 <dd className="text-right">
-                  {invoice.issuedAt ? invoice.issuedAt.toLocaleDateString() : "—"}
+                  {invoice.issuedAt ? formatDate(invoice.issuedAt) : "—"}
                 </dd>
                 <dt className="text-muted-foreground">Due</dt>
-                <dd className="text-right">
-                  {invoice.dueDate ? invoice.dueDate.toLocaleDateString() : "—"}
-                </dd>
+                <dd className="text-right">{invoice.dueDate ? formatDate(invoice.dueDate) : "—"}</dd>
                 <dt className="text-muted-foreground">Total</dt>
                 <dd className="text-right font-semibold">{formatMoney(total, invoice.currency)}</dd>
               </dl>

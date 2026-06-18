@@ -189,7 +189,7 @@ async function main() {
         clientId: `seed_client_${clientKey}`,
         number,
         amount,
-        currency: "USD",
+        currency: "PHP",
         status,
         issuedAt,
         dueDate,

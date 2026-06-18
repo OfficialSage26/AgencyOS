@@ -133,7 +133,7 @@ export function InvoiceFormDialog({
                 <select
                   id="currency"
                   name="currency"
-                  defaultValue={invoice?.currency ?? "USD"}
+                  defaultValue={invoice?.currency ?? "PHP"}
                   className={selectClass}
                 >
                   {CURRENCIES.map((c) => (
