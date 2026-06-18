@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Show, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/marketing/brand-mark";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { href: "#features", label: "Product" },
@@ -35,6 +36,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Show when="signed-out">
             <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
               Sign in

@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -52,13 +53,21 @@ export default function RootLayout({
   return (
     <html
       lang="en-PH"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <ClerkProvider>
-          {children}
-          <Toaster />
-        </ClerkProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ClerkProvider>
+            {children}
+            <Toaster />
+          </ClerkProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
