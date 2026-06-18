@@ -2,7 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { CreateOrganization, UserButton } from "@clerk/nextjs";
 import { Layers } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
-import { getTenant } from "@/lib/tenant/context";
+import { requireTenantDb } from "@/lib/tenant/context";
+import { getOrgPlan } from "@/lib/billing/limits";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { orgId } = await auth();
@@ -35,14 +36,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
     );
   }
 
-  // Ensure the tenant is provisioned. After the first visit this is a single
-  // cached DB read (shared with the page below); it only calls Clerk + writes
-  // on the very first load after an org is created.
-  await getTenant();
+  // Ensure the tenant is provisioned, then load the org-scoped counts that drive
+  // the sidebar's live nav badges and plan-gated upgrade card. The tenant lookup
+  // is React-cached, so this shares the resolution with the page below.
+  const { tenant, db } = await requireTenantDb();
+  const [plan, leadCount, overdueCount] = await Promise.all([
+    getOrgPlan(tenant.organizationId),
+    db.lead.count({ where: { stage: { notIn: ["WON", "LOST"] } } }),
+    db.invoice.count({ where: { status: "OVERDUE" } }),
+  ]);
 
   return (
     <div className="flex min-h-full">
-      <DashboardSidebar />
+      <DashboardSidebar plan={plan} leadCount={leadCount} overdueCount={overdueCount} />
       <div className="flex min-w-0 flex-1 flex-col">{children}</div>
     </div>
   );
