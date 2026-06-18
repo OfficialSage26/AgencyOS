@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireTenant } from "@/lib/tenant/context";
 import { forOrg } from "@/lib/tenant/scoped-db";
 import { PrintInvoice, type PrintInvoiceData } from "@/components/invoices/print-invoice";
+import { formatDate } from "@/lib/format";
 
 export default async function InvoicePrintPage({
   params,
@@ -37,8 +38,8 @@ export default async function InvoicePrintPage({
     number: invoice.number,
     status: invoice.status,
     currency: invoice.currency,
-    issuedAt: invoice.issuedAt ? invoice.issuedAt.toLocaleDateString() : null,
-    dueDate: invoice.dueDate ? invoice.dueDate.toLocaleDateString() : null,
+    issuedAt: invoice.issuedAt ? formatDate(invoice.issuedAt) : null,
+    dueDate: invoice.dueDate ? formatDate(invoice.dueDate) : null,
     org: { name: organization?.name ?? "AgencyOS" },
     client: invoice.client,
     items,

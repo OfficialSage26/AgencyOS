@@ -9,9 +9,9 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
   OVERDUE: "Overdue",
 };
 
-// A small, currency-agnostic set covering the common cases. Stored as the ISO
-// code; formatting happens at display time with Intl.NumberFormat.
-export const CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD"] as const;
+// A small currency set; PHP is the default for this Philippines-based app.
+// Stored as the ISO code; formatting happens at display time via Intl.
+export const CURRENCIES = ["PHP", "USD", "EUR", "GBP", "CAD", "AUD"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
 const emptyToUndefined = (v: unknown) => (typeof v === "string" && v.trim() === "" ? undefined : v);
@@ -23,7 +23,7 @@ const optionalDate = z.preprocess(
 
 export const invoiceInputSchema = z.object({
   clientId: z.preprocess(emptyToUndefined, z.string().optional()),
-  currency: z.enum(CURRENCIES).default("USD"),
+  currency: z.enum(CURRENCIES).default("PHP"),
   status: z.enum(INVOICE_STATUSES).default("DRAFT"),
   issuedAt: optionalDate,
   dueDate: optionalDate,
@@ -45,9 +45,9 @@ export type InvoiceItemInput = z.infer<typeof invoiceItemSchema>;
 
 export const invoiceStatusSchema = z.object({ status: z.enum(INVOICE_STATUSES) });
 
-export function formatMoney(amount: number, currency: string) {
+export function formatMoney(amount: number, currency: string = "PHP") {
   try {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+    return new Intl.NumberFormat("en-PH", { style: "currency", currency }).format(amount);
   } catch {
     return `${currency} ${amount.toFixed(2)}`;
   }

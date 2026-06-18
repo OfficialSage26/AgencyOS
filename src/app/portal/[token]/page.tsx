@@ -10,6 +10,7 @@ import {
   formatMoney,
   type InvoiceStatus,
 } from "@/lib/validations/invoice";
+import { formatDate, formatTime, manilaDayParts } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Client Portal" };
 
@@ -49,7 +50,7 @@ async function loadPortal(token: string) {
 
   const now = Date.now();
   const upcoming = appointments.filter((a) => a.endTime.getTime() >= now);
-  const currency = invoices[0]?.currency ?? "USD";
+  const currency = invoices[0]?.currency ?? "PHP";
   const outstanding = invoices
     .filter((i) => i.status === "SENT" || i.status === "OVERDUE")
     .reduce((sum, i) => sum + Number(i.amount), 0);
@@ -94,14 +95,7 @@ export default async function ClientPortalPage({
         <SummaryCard
           icon={CalendarClock}
           label="Next meeting"
-          value={
-            nextAppt
-              ? nextAppt.startTime.toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                })
-              : "—"
-          }
+          value={nextAppt ? formatDate(nextAppt.startTime) : "—"}
           tint="#10b981"
         />
       </div>
@@ -164,7 +158,7 @@ export default async function ClientPortalPage({
                         </Badge>
                       </td>
                       <td className="text-muted-foreground px-6 py-3">
-                        {invoice.dueDate ? invoice.dueDate.toLocaleDateString() : "—"}
+                        {invoice.dueDate ? formatDate(invoice.dueDate) : "—"}
                       </td>
                       <td className="px-6 py-3 text-right tabular-nums">
                         {formatMoney(Number(invoice.amount), invoice.currency)}
@@ -189,21 +183,13 @@ export default async function ClientPortalPage({
                 {upcoming.map((appt) => (
                   <li key={appt.id} className="flex items-center gap-3">
                     <span className="bg-primary/10 text-primary flex size-9 shrink-0 flex-col items-center justify-center rounded-lg text-[10px] leading-none font-medium">
-                      <span>{appt.startTime.toLocaleString(undefined, { month: "short" }).toUpperCase()}</span>
-                      <span className="text-sm font-bold">{appt.startTime.getDate()}</span>
+                      <span>{manilaDayParts(appt.startTime).month}</span>
+                      <span className="text-sm font-bold">{manilaDayParts(appt.startTime).day}</span>
                     </span>
                     <div>
                       <p className="text-sm font-medium">{appt.title ?? "Appointment"}</p>
                       <p className="text-muted-foreground text-xs">
-                        {appt.startTime.toLocaleTimeString(undefined, {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                        {" – "}
-                        {appt.endTime.toLocaleTimeString(undefined, {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
+                        {formatTime(appt.startTime)} – {formatTime(appt.endTime)}
                       </p>
                     </div>
                   </li>

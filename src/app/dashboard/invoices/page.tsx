@@ -10,6 +10,7 @@ import {
   formatMoney,
   type InvoiceStatus,
 } from "@/lib/validations/invoice";
+import { formatDate } from "@/lib/format";
 
 const statusBadge: Record<InvoiceStatus, string> = {
   DRAFT: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
@@ -42,7 +43,7 @@ export default async function InvoicesPage() {
             <p className="text-muted-foreground text-sm">Bill clients and track payments.</p>
             {outstanding > 0 && (
               <p className="mt-1 text-sm font-medium">
-                {formatMoney(outstanding, invoices[0]?.currency ?? "USD")} outstanding
+                {formatMoney(outstanding, invoices[0]?.currency ?? "PHP")} outstanding
               </p>
             )}
           </div>
@@ -113,7 +114,7 @@ export default async function InvoicesPage() {
                         </Badge>
                       </td>
                       <td className="text-muted-foreground px-4 py-3">
-                        {invoice.dueDate ? invoice.dueDate.toLocaleDateString() : "—"}
+                        {invoice.dueDate ? formatDate(invoice.dueDate) : "—"}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
                         {formatMoney(Number(invoice.amount), invoice.currency)}

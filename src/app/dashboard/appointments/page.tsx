@@ -7,21 +7,18 @@ import {
   type AppointmentFormValues,
 } from "@/components/appointments/appointment-form-dialog";
 import { DeleteAppointmentButton } from "@/components/appointments/delete-appointment-button";
+import { PH_LOCALE, PH_TIMEZONE, formatTime, toDateTimeLocalManila } from "@/lib/format";
 
-// Format a Date as the "YYYY-MM-DDTHH:mm" value a datetime-local input expects.
-function toLocalInput(d: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+const toLocalInput = toDateTimeLocalManila;
 
 const timeRange = (start: Date, end: Date) => {
-  const date = start.toLocaleDateString(undefined, {
+  const date = start.toLocaleDateString(PH_LOCALE, {
+    timeZone: PH_TIMEZONE,
     weekday: "short",
     month: "short",
     day: "numeric",
   });
-  const fmt = (d: Date) => d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-  return `${date} · ${fmt(start)} – ${fmt(end)}`;
+  return `${date} · ${formatTime(start)} – ${formatTime(end)}`;
 };
 
 type Row = {

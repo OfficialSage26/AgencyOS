@@ -19,6 +19,7 @@ import { requireTenantDb } from "@/lib/tenant/context";
 import { ClientFormDialog, type ClientFormValues } from "@/components/clients/client-form-dialog";
 import { AddNoteForm } from "@/components/clients/add-note-form";
 import { ClientPortalCard } from "@/components/clients/client-portal-card";
+import { formatDate, formatDateTime } from "@/lib/format";
 
 const statusBadge: Record<ClientFormValues["status"], string> = {
   ACTIVE: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400",
@@ -109,9 +110,7 @@ export default async function ClientDetailPage({
                   <span>{client.company ?? "—"}</span>
                 </div>
                 <Separator />
-                <p className="text-muted-foreground">
-                  Added {client.createdAt.toLocaleDateString()}
-                </p>
+                <p className="text-muted-foreground">Added {formatDate(client.createdAt)}</p>
               </CardContent>
             </Card>
 
@@ -163,7 +162,7 @@ export default async function ClientDetailPage({
                         <p className="text-sm whitespace-pre-wrap">{activity.description}</p>
                         <p className="text-muted-foreground mt-0.5 text-xs">
                           {activity.user?.name ?? activity.user?.email ?? "System"} ·{" "}
-                          {activity.createdAt.toLocaleString()}
+                          {formatDateTime(activity.createdAt)}
                         </p>
                       </div>
                     </li>

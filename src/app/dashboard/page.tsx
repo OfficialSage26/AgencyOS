@@ -21,6 +21,7 @@ import {
 import { PROJECT_STATUS_LABELS, type ProjectStatus } from "@/lib/validations/project";
 import { LEAD_STAGES, LEAD_STAGE_LABELS } from "@/lib/validations/lead";
 import { formatMoney } from "@/lib/validations/invoice";
+import { PH_LOCALE, PH_TIMEZONE, formatTime, manilaDayParts } from "@/lib/format";
 
 type Db = Awaited<ReturnType<typeof requireTenantDb>>["db"];
 
@@ -80,7 +81,7 @@ async function loadDashboard(db: Db) {
     db.invoice.findFirst({ orderBy: { createdAt: "desc" }, select: { currency: true } }),
   ]);
 
-  const currency = sampleInvoice?.currency ?? "USD";
+  const currency = sampleInvoice?.currency ?? "PHP";
 
   // Revenue trend: last 6 months of paid invoices, bucketed by issue date.
   const buckets = Array.from({ length: 6 }, (_, i) => {
@@ -129,7 +130,8 @@ async function loadDashboard(db: Db) {
     0,
   );
 
-  const todayLabel = now.toLocaleDateString(undefined, {
+  const todayLabel = now.toLocaleDateString(PH_LOCALE, {
+    timeZone: PH_TIMEZONE,
     weekday: "long",
     month: "long",
     day: "numeric",
@@ -357,20 +359,17 @@ export default async function DashboardPage() {
                   {d.upcoming.map((appt) => (
                     <li key={appt.id} className="flex items-start gap-3">
                       <span className="bg-primary/10 text-primary mt-0.5 flex size-9 shrink-0 flex-col items-center justify-center rounded-lg text-[10px] leading-none font-medium">
-                        <span>
-                          {appt.startTime.toLocaleString(undefined, { month: "short" }).toUpperCase()}
+                        <span>{manilaDayParts(appt.startTime).month}</span>
+                        <span className="text-sm font-bold">
+                          {manilaDayParts(appt.startTime).day}
                         </span>
-                        <span className="text-sm font-bold">{appt.startTime.getDate()}</span>
                       </span>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">
                           {appt.title ?? appt.client?.name ?? "Appointment"}
                         </p>
                         <p className="text-muted-foreground text-xs">
-                          {appt.startTime.toLocaleTimeString(undefined, {
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })}
+                          {formatTime(appt.startTime)}
                           {appt.client && appt.title ? ` · ${appt.client.name}` : ""}
                         </p>
                       </div>

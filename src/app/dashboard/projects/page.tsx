@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireTenantDb } from "@/lib/tenant/context";
 import { ProjectFormDialog } from "@/components/projects/project-form-dialog";
 import { PROJECT_STATUS_LABELS, type ProjectStatus } from "@/lib/validations/project";
+import { formatDate } from "@/lib/format";
 
 const statusBadge: Record<ProjectStatus, string> = {
   PLANNING: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
@@ -99,7 +100,7 @@ export default async function ProjectsPage() {
                     </div>
                     <div className="text-muted-foreground flex justify-between text-xs">
                       <span>{project._count.tasks} tasks</span>
-                      {project.deadline && <span>Due {project.deadline.toLocaleDateString()}</span>}
+                      {project.deadline && <span>Due {formatDate(project.deadline)}</span>}
                     </div>
                   </CardContent>
                 </Card>
